@@ -26,6 +26,24 @@ async function run() {
         app.get('/', (req, res) => {
             res.send('Tech Moto App Server Is Ready')
         })
+
+        
+        // on login get user info
+        app.put('/users/:email', async (req, res) => {
+            const email = req.params.email;
+            const user = req.body
+            const filter = { email: email };
+            const options = { upsert: true };
+
+            const updateDoc = {
+                $set: user,
+            }
+
+            const result = await usersCollection.updateOne(filter, updateDoc, options);
+            const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN, { expiresIn: '1d' });
+            res.send({ result, token });
+            console.log(user);
+        })
         
         } finally {
 
