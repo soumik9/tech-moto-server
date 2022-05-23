@@ -6,7 +6,7 @@ require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 5000;
- 
+
 //middleware
 app.use(cors());
 app.use(express.json());
@@ -17,17 +17,18 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 
 async function run() {
     try {
-    
+
         // connect to mongodb collection
         await client.connect();
         const usersCollection = client.db("tech-moto").collection("users");
+        const reviewsCollection = client.db("tech-moto").collection("reviews");
 
         // api homepage
         app.get('/', (req, res) => {
             res.send('Tech Moto App Server Is Ready')
         })
 
-        
+
         // on login get user info
         app.put('/users/:email', async (req, res) => {
             const email = req.params.email;
@@ -42,10 +43,15 @@ async function run() {
             const result = await usersCollection.updateOne(filter, updateDoc, options);
             const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN, { expiresIn: '1d' });
             res.send({ result, token });
-            console.log(user);
         })
-        
-        } finally {
+
+        // api get all reviews
+        app.get('/reviews', async (req, res) => {
+            const reviews = await reviewsCollection.find({}).toArray();
+            res.send(reviews);
+        })
+
+    } finally {
 
     }
 }
