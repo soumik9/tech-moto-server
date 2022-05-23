@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
@@ -50,6 +50,14 @@ async function run() {
         app.get('/tools', async (req, res) => {
             const tools = await toolsCollection.find({}).toArray();
             res.send(tools);
+        })
+
+        // api get single tool 
+        app.get('/tool/:toolId', async (req, res) => {
+            const id = req.params.toolId;
+            const query = {_id: ObjectId(id)};
+            const tool = await toolsCollection.findOne(query);
+            res.send(tool);
         })
 
         // api get all reviews
