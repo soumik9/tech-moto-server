@@ -22,6 +22,7 @@ async function run() {
         await client.connect();
         const usersCollection = client.db("tech-moto").collection("users");
         const reviewsCollection = client.db("tech-moto").collection("reviews");
+        const toolsCollection = client.db("tech-moto").collection("tools");
 
         // api homepage
         app.get('/', (req, res) => {
@@ -43,6 +44,12 @@ async function run() {
             const result = await usersCollection.updateOne(filter, updateDoc, options);
             const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN, { expiresIn: '1d' });
             res.send({ result, token });
+        })
+
+        // api get all tools
+        app.get('/tools', async (req, res) => {
+            const tools = await toolsCollection.find({}).toArray();
+            res.send(tools);
         })
 
         // api get all reviews
