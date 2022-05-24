@@ -89,6 +89,24 @@ async function run() {
             res.send(tool);
         })
 
+         // update quantitt on order
+         app.put('/update-tool/:toolId', async (req, res) => {
+            const id = req.params.toolId;
+            const tool = req.body
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true };
+
+            const updateDoc = {
+                $set: {
+                    quantity: tool.newQuantity,
+                    sold: tool.newSold,
+                }
+            }
+
+            const result = await toolsCollection.updateOne(filter, updateDoc, options);
+            res.send(result);
+        })
+
         // api add new order
         app.post('/add-order', async (req, res) => {
             const newOrder = req.body;
