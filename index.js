@@ -15,6 +15,27 @@ app.use(express.json());
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@tech-moto.cy4t9.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
+// jwt verification
+function verifyJWT(req, res, next) {
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader) {
+        return res.status(401).send({ message: 'Unauthorized access' });
+    }
+
+    const token = authHeader.split(' ')[1];
+ 
+
+    jwt.verify(token, process.env.ACCESS_TOKEN, (err, decoded) => {
+        if (err) {
+            console.log(err);
+            return res.status(403).send({ message: 'Forbidden access' });
+        }
+        req.decoded = decoded;
+        next();
+    })
+}
+
 async function run() {
     try {
 
@@ -29,7 +50,6 @@ async function run() {
         app.get('/', (req, res) => {
             res.send('Tech Moto App Server Is Ready')
         })
-
 
         // on login get user info
         app.put('/users/:email', async (req, res) => {
@@ -46,6 +66,20 @@ async function run() {
             const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN, { expiresIn: '1d' });
             res.send({ result, token });
         })
+
+        // get user role by email
+        app.get('/admin/:email', verifyJWT, async (req, res) => {
+            const email = req.params.email;
+            const decodedEmail = req.decoded.email;
+            if(email === decodedEmail){
+                const user = await usersCollection.findOne({email: email});
+                const isAdmin = user.role === 'admin';
+                res.send({admin: isAdmin});
+            }else{
+                res.status(403).send({ message: 'forbidden access' });
+            }
+        })
+
 
         // api single user info
         app.get('/user/:email', async (req, res) => {
