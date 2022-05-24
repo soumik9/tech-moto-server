@@ -22,6 +22,7 @@ async function run() {
         await client.connect();
         const usersCollection = client.db("tech-moto").collection("users");
         const reviewsCollection = client.db("tech-moto").collection("reviews");
+        const ordersCollection = client.db("tech-moto").collection("orders");
         const toolsCollection = client.db("tech-moto").collection("tools");
 
         // api homepage
@@ -53,7 +54,6 @@ async function run() {
             const user = await usersCollection.findOne(query);
             res.send(user);
         })
-
 
         // user update api
         app.put('/update-user/:email', async (req, res) => {
@@ -89,6 +89,13 @@ async function run() {
             res.send(tool);
         })
 
+        // api add new order
+        app.post('/add-order', async (req, res) => {
+            const newOrder = req.body;
+            const result = await ordersCollection.insertOne(newOrder);
+            res.send(result);
+        })
+
         // api get all reviews
         app.get('/reviews', async (req, res) => {
             const reviews = await reviewsCollection.find({}).toArray();
@@ -99,7 +106,6 @@ async function run() {
         app.post('/add-review', async (req, res) => {
             const newReview = req.body;
             const result = await reviewsCollection.insertOne(newReview);
-            console.log(result);
             res.send(result);
         })
 
