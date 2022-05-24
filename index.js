@@ -96,27 +96,15 @@ async function run() {
             const filter = { _id: ObjectId(id) };
             const options = { upsert: true };
 
-            if(tool.newQuantity && tool.newSold){
-                const updateDoc = {
-                    $set: {
-                        quantity: tool.newQuantity,
-                        sold: tool.newSold,
-                    }
+            const updateDoc = {
+                $set: {
+                    quantity: tool.newQuantity,
+                    sold: tool.newSold,
                 }
-    
-                const result = await toolsCollection.updateOne(filter, updateDoc, options);
-                res.send(result);
-            }else{
-                const updateDoc = {
-                    $set: {
-                        quantity: addQuantity,
-                    }
-                }
-    
-                const result = await toolsCollection.updateOne(filter, updateDoc, options);
-                res.send(result);
             }
-           
+
+            const result = await toolsCollection.updateOne(filter, updateDoc, options);
+            res.send(result);
         })
 
         // api get orders by filter email
