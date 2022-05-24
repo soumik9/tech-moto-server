@@ -68,9 +68,24 @@ async function run() {
         })
 
         // get user role by email
+        app.get('/user-role/:email', verifyJWT, async (req, res) => {
+            const email = req.params.email;
+            const decodedEmail = req.decoded.email;
+
+            if(email === decodedEmail){
+                const user = await usersCollection.findOne({email: email});
+                const isUser = user.role === 'user';
+                res.send({user: isUser});
+            }else{
+                res.status(403).send({ message: 'forbidden access' });
+            }
+        })
+
+        // get admin role by email
         app.get('/admin/:email', verifyJWT, async (req, res) => {
             const email = req.params.email;
             const decodedEmail = req.decoded.email;
+
             if(email === decodedEmail){
                 const user = await usersCollection.findOne({email: email});
                 const isAdmin = user.role === 'admin';
