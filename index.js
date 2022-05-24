@@ -96,22 +96,33 @@ async function run() {
             const filter = { _id: ObjectId(id) };
             const options = { upsert: true };
 
-            const updateDoc = {
-                $set: {
-                    quantity: tool.newQuantity,
-                    sold: tool.newSold,
+            if(tool.newQuantity && tool.newSold){
+                const updateDoc = {
+                    $set: {
+                        quantity: tool.newQuantity,
+                        sold: tool.newSold,
+                    }
                 }
+    
+                const result = await toolsCollection.updateOne(filter, updateDoc, options);
+                res.send(result);
+            }else{
+                const updateDoc = {
+                    $set: {
+                        quantity: addQuantity,
+                    }
+                }
+    
+                const result = await toolsCollection.updateOne(filter, updateDoc, options);
+                res.send(result);
             }
-
-            const result = await toolsCollection.updateOne(filter, updateDoc, options);
-            res.send(result);
+           
         })
 
         // api get orders by filter email
         app.get('/orders/:email', async (req, res) => {
             const email = req.params.email;
             const orders = await ordersCollection.find({email: email}).toArray();
-            console.log(orders);
             res.send(orders);
         })
 
@@ -119,6 +130,16 @@ async function run() {
         app.post('/add-order', async (req, res) => {
             const newOrder = req.body;
             const result = await ordersCollection.insertOne(newOrder);
+            res.send(result);
+        })
+
+        // delete order
+        app.delete('/order/:orderId', async (req, res) => {
+            const id = req.params.orderId;
+            console.log(id);
+            const query = {_id: ObjectId(id)};
+            const result = await ordersCollection.deleteOne(query);
+            console.log(result);
             res.send(result);
         })
 
