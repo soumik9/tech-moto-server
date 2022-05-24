@@ -46,12 +46,19 @@ async function run() {
             res.send({ result, token });
         })
 
+        // api single user info
+        app.get('/user/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = {email: email};
+            const user = await usersCollection.findOne(query);
+            res.send(user);
+        })
+
 
         // user update api
         app.put('/update-user/:email', async (req, res) => {
             const email = req.params.email;
             const user = req.body
-            console.log(user);
             const filter = { email: email };
             const options = { upsert: true };
 
