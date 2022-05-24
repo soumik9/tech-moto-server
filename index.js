@@ -46,6 +46,28 @@ async function run() {
             res.send({ result, token });
         })
 
+
+        // user update api
+        app.put('/update-user/:email', async (req, res) => {
+            const email = req.params.email;
+            const user = req.body
+            console.log(user);
+            const filter = { email: email };
+            const options = { upsert: true };
+
+            const updateDoc = {
+                $set: {
+                    education: user.education,
+                    location: user.location,
+                    mobile: user.mobile,
+                    linkedin: user.linkedin,
+                }
+            }
+
+            const result = await usersCollection.updateOne(filter, updateDoc, options);
+            res.send(result);
+        })
+
         // api get all tools
         app.get('/tools', async (req, res) => {
             const tools = await toolsCollection.find({}).toArray();
