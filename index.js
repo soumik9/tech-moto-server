@@ -107,6 +107,14 @@ async function run() {
             res.send(result);
         })
 
+        // api get orders by filter email
+        app.get('/orders/:email', async (req, res) => {
+            const email = req.params.email;
+            const orders = await ordersCollection.find({email: email}).toArray();
+            console.log(orders);
+            res.send(orders);
+        })
+
         // api add new order
         app.post('/add-order', async (req, res) => {
             const newOrder = req.body;
