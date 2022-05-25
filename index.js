@@ -51,7 +51,7 @@ async function run() {
             if (requesterAcc.role === 'admin') {
                 next();
             }else{
-                return res.status(403).send({ message: 'forbidden' });
+                return res.status(403).send({ message: 'forbidden! Not a admin' });
             }
         }
 
@@ -174,7 +174,7 @@ async function run() {
         })
 
         // delete tool
-        app.delete('/tool/:toolId', verifyJWT, async (req, res) => {
+        app.delete('/tool/:toolId', verifyJWT, verifyAdmin, async (req, res) => {
             const id = req.params.toolId;
             const query = {_id: ObjectId(id)};
             const result = await toolsCollection.deleteOne(query);
