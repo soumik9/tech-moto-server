@@ -18,7 +18,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 // jwt verification
 function verifyJWT(req, res, next) {
     const authHeader = req.headers.authorization;
-    
+    console.log(authHeader);
     if (!authHeader) {
         return res.status(401).send({ message: 'Unauthorized access' });
     }
@@ -46,6 +46,18 @@ async function run() {
         const ordersCollection = client.db("tech-moto").collection("orders");
         const toolsCollection = client.db("tech-moto").collection("tools");
 
+        // verify a admin
+        const verifyAdmin = async (req, res, next) => {
+            const requester = req.decoded.email;
+            const requesterAcc = await usersCollection.findOne({ email: requester });
+
+            if (requesterAcc.role === 'admin') {
+                next();
+            }else{
+                return res.status(403).send({ message: 'forbidden' });
+            }
+        }
+
         // api homepage
         app.get('/', (req, res) => {
             res.send('Tech Moto App Server Is Ready')
@@ -63,8 +75,22 @@ async function run() {
             }
 
             const result = await usersCollection.updateOne(filter, updateDoc, options);
-            const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN, { expiresIn: '1d' });
+            const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN, { expiresIn: '10d' });
             res.send({ result, token });
+        })
+
+        // make new admin
+        app.put('/user/make-admin/:email', verifyJWT, verifyAdmin, async (req, res) => {
+            const email = req.params.email;
+            console.log(email);
+            const filter = { email: email };
+
+            const updateDoc = {
+                $set: { role: 'admin' },
+            }
+            const result = await usersCollection.updateOne(filter, updateDoc);
+            console.log(result);
+            return res.send(result);
         })
 
         // api get all tools
@@ -100,7 +126,6 @@ async function run() {
                 res.status(403).send({ message: 'forbidden access' });
             }
         })
-
 
         // api single user info
         app.get('/user/:email', async (req, res) => {
