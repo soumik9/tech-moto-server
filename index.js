@@ -43,6 +43,7 @@ async function run() {
         const reviewsCollection = client.db("tech-moto").collection("reviews");
         const ordersCollection = client.db("tech-moto").collection("orders");
         const toolsCollection = client.db("tech-moto").collection("tools");
+        const paymentCollection = client.db("tech-moto").collection("payments");
 
         // verify a admin
         const verifyAdmin = async (req, res, next) => {
@@ -229,6 +230,24 @@ async function run() {
             res.send(result);
         })
 
+        app.patch('/order/:orderId', verifyJWT, async (req, res) => {
+            const id = req.params.orderId;
+            const updateOrder = req.body;
+            const filter = { _id: ObjectId(id) };
+
+            const updateDoc = {
+                $set: {
+                    isPaid: "true",
+                    transactionId: updateOrder.transactionId,
+                }
+            }
+
+            const updatedOrder = await ordersCollection.updateOne(filter, updateDoc);
+            const result = await paymentCollection.insertOne(updateOrder);
+            res.send(result);
+            console.log(updatedOrder);
+        })
+
         // update order status api
         app.put('/update-order/:orderId', verifyJWT, verifyAdmin, async (req, res) => {
             const id = req.params.orderId;
@@ -242,7 +261,6 @@ async function run() {
             }
 
             const result = await ordersCollection.updateOne(filter, updateDoc);
-            console.log(result);
             res.send(result);
         })
 
@@ -276,7 +294,6 @@ async function run() {
                 currency: 'usd',
                 payment_method_types:['card']
             });
-            console.log(paymentIntent.client_secret);
             res.send({ clientSecret: paymentIntent.client_secret });
         })
 
