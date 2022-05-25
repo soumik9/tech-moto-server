@@ -205,6 +205,13 @@ async function run() {
             res.send(orders);
         })
 
+        // api get order by id
+        app.get('/order/:orderId', async (req, res) => {
+            const id = req.params.orderId;
+            const order = await ordersCollection.findOne({id: ObjectId(id)});
+            res.send(order);
+        })
+
         // api get orders by filter email
         app.get('/orders/:email', async (req, res) => {
             const email = req.params.email;
