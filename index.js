@@ -174,7 +174,7 @@ async function run() {
         })
 
         // delete tool
-        app.delete('/tool/:toolId', async (req, res) => {
+        app.delete('/tool/:toolId', verifyJWT, async (req, res) => {
             const id = req.params.toolId;
             const query = {_id: ObjectId(id)};
             const result = await toolsCollection.deleteOne(query);
