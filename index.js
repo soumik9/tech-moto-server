@@ -67,6 +67,12 @@ async function run() {
             res.send({ result, token });
         })
 
+        // api get all tools
+        app.get('/users', async (req, res) => {
+            const users = await usersCollection.find({}).toArray();
+            res.send(users);
+        })
+
         // get user role by email
         app.get('/user-role/:email', verifyJWT, async (req, res) => {
             const email = req.params.email;
