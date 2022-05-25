@@ -37,7 +37,7 @@ function verifyJWT(req, res, next) {
 async function run() {
     try {
 
-        // connect to mongodb collection
+        // connect to mongodb collection 
         await client.connect();
         const usersCollection = client.db("tech-moto").collection("users");
         const reviewsCollection = client.db("tech-moto").collection("reviews");
