@@ -199,6 +199,12 @@ async function run() {
             res.send(result);
         })
 
+        // api get all orders
+        app.get('/orders', verifyJWT, verifyAdmin, async (req, res) => {
+            const orders = await ordersCollection.find({}).toArray();
+            res.send(orders);
+        })
+
         // api get orders by filter email
         app.get('/orders/:email', async (req, res) => {
             const email = req.params.email;
