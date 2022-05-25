@@ -125,7 +125,7 @@ async function run() {
         })
 
         // api add new tool
-        app.post('/add-tool', async (req, res) => {
+        app.post('/add-tool', verifyJWT, async (req, res) => {
             const newTool = req.body;
             const result = await toolsCollection.insertOne(newTool);
             res.send(result);
