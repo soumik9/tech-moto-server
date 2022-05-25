@@ -206,7 +206,7 @@ async function run() {
         })
 
         // api get order by id
-        app.get('/order/:orderId', async (req, res) => {
+        app.get('/order/:orderId', verifyJWT, async (req, res) => {
             const id = req.params.orderId;
             const order = await ordersCollection.findOne({id: ObjectId(id)});
             res.send(order);
