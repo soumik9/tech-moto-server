@@ -268,7 +268,7 @@ async function run() {
         })
 
         // payment
-        app.post('/create-payment', verifyJWT, async(req, res) => {
+        app.post('/create-payment', verifyJWT, async (req, res) => {
             const { price } = req.body;
             const amount = price * 100;
             const paymentIntent = await stripe.paymentIntents.create({
@@ -276,6 +276,7 @@ async function run() {
                 currency: 'usd',
                 payment_method_types:['card']
             });
+            console.log(paymentIntent.client_secret);
             res.send({ clientSecret: paymentIntent.client_secret });
         })
 
