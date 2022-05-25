@@ -219,6 +219,23 @@ async function run() {
             res.send(result);
         })
 
+        // update order status api
+        app.put('/update-order/:orderId', verifyJWT, verifyAdmin, async (req, res) => {
+            const id = req.params.orderId;
+            const order = req.body
+            const filter = { _id: ObjectId(id) };
+
+            const updateDoc = {
+                $set: {
+                    status: order.status,
+                }
+            }
+
+            const result = await ordersCollection.updateOne(filter, updateDoc);
+            console.log(result);
+            res.send(result);
+        })
+
         // delete order
         app.delete('/order/:orderId', async (req, res) => {
             const id = req.params.orderId;
