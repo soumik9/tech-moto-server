@@ -18,17 +18,14 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 // jwt verification
 function verifyJWT(req, res, next) {
     const authHeader = req.headers.authorization;
-    console.log(authHeader);
     if (!authHeader) {
         return res.status(401).send({ message: 'Unauthorized access' });
     }
 
     const token = authHeader.split(' ')[1];
- 
 
     jwt.verify(token, process.env.ACCESS_TOKEN, (err, decoded) => {
         if (err) {
-            console.log(err);
             return res.status(403).send({ message: 'Forbidden access' });
         }
         req.decoded = decoded;
@@ -93,7 +90,7 @@ async function run() {
             return res.send(result);
         })
 
-        // api get all tools
+        // api get all users
         app.get('/users', async (req, res) => {
             const users = await usersCollection.find({}).toArray();
             res.send(users);
@@ -176,8 +173,16 @@ async function run() {
             res.send(tool);
         })
 
-         // update quantitt on order
-         app.put('/update-tool/:toolId', async (req, res) => {
+        // delete tool
+        app.delete('/tool/:toolId', async (req, res) => {
+            const id = req.params.toolId;
+            const query = {_id: ObjectId(id)};
+            const result = await toolsCollection.deleteOne(query);
+            res.send(result);
+        })
+
+        // update quantity on order
+        app.put('/update-tool/:toolId', async (req, res) => {
             const id = req.params.toolId;
             const tool = req.body
             const filter = { _id: ObjectId(id) };
@@ -211,10 +216,8 @@ async function run() {
         // delete order
         app.delete('/order/:orderId', async (req, res) => {
             const id = req.params.orderId;
-            console.log(id);
             const query = {_id: ObjectId(id)};
             const result = await ordersCollection.deleteOne(query);
-            console.log(result);
             res.send(result);
         })
 
