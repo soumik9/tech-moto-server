@@ -124,6 +124,13 @@ async function run() {
             res.send(result);
         })
 
+        // api add new tool
+        app.post('/add-tool', async (req, res) => {
+            const newTool = req.body;
+            const result = await toolsCollection.insertOne(newTool);
+            res.send(result);
+        })
+
         // api get all tools
         app.get('/tools', async (req, res) => {
             const tools = await toolsCollection.find({}).toArray();
