@@ -208,7 +208,9 @@ async function run() {
         // api get order by id
         app.get('/order/:orderId', verifyJWT, async (req, res) => {
             const id = req.params.orderId;
-            const order = await ordersCollection.findOne({id: ObjectId(id)});
+            console.log(id);
+            const order = await ordersCollection.findOne({_id: ObjectId(id)});
+            console.log(order);
             res.send(order);
         })
 
