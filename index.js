@@ -210,17 +210,21 @@ async function run() {
         // api get order by id
         app.get('/order/:orderId', verifyJWT, async (req, res) => {
             const id = req.params.orderId;
-            console.log(id);
             const order = await ordersCollection.findOne({_id: ObjectId(id)});
-            console.log(order);
             res.send(order);
         })
 
         // api get orders by filter email
-        app.get('/orders/:email', async (req, res) => {
+        app.get('/orders/:email', verifyJWT, async (req, res) => {
             const email = req.params.email;
-            const orders = await ordersCollection.find({email: email}).toArray();
-            res.send(orders);
+            const decodedEmail = req.decoded.email;
+
+            if(email === decodedEmail){
+                const orders = await ordersCollection.find({email: email}).toArray();
+                res.send(orders);
+            }else{
+                res.status(403).send({ message: 'forbidden access' });
+            }
         })
 
         // api add new order
@@ -245,7 +249,6 @@ async function run() {
             const updatedOrder = await ordersCollection.updateOne(filter, updateDoc);
             const result = await paymentCollection.insertOne(updateOrder);
             res.send(result);
-            console.log(updatedOrder);
         })
 
         // update order status api
