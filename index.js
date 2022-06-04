@@ -81,14 +81,24 @@ async function run() {
         // make new admin
         app.put('/user/make-admin/:email', verifyJWT, verifyAdmin, async (req, res) => {
             const email = req.params.email;
-            console.log(email);
             const filter = { email: email };
 
             const updateDoc = {
                 $set: { role: 'admin' },
             }
             const result = await usersCollection.updateOne(filter, updateDoc);
-            console.log(result);
+            return res.send(result);
+        })
+
+        // remove admin
+        app.put('/user/remove-admin/:email', verifyJWT, verifyAdmin, async (req, res) => {
+            const email = req.params.email;
+            const filter = { email: email };
+
+            const updateDoc = {
+                $set: { role: 'user' },
+            }
+            const result = await usersCollection.updateOne(filter, updateDoc);
             return res.send(result);
         })
 
